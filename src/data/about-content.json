@@ -1,0 +1,18 @@
+{
+  "mission": "Créer des expériences visuelles, émotionnelles et stratégiques, sur-mesure, sans jamais rentrer dans les cases.",
+  "ceoQuote": "Chez Mabelle Consulting, nous croyons que chaque marque a une histoire unique à raconter...",
+  "ceoName": "CEO, Mabelle Consulting",
+  "team": [
+    {
+      "name": "mohamed",
+      "role": "Full-Stack développeur",
+      "image": "/uploads/about/team/1754763301617-t_l_chargement.png"
+    },
+    {
+      "name": "Aminata Guisse ",
+      "role": "Directrice General ",
+      "image": "/uploads/about/team/1754767602963-t_l_chargement__9_.jpg"
+    }
+  ],
+  "clients": []
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,10 +25,31 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={geistSans.className}>
+        <header className="w-full bg-white shadow-sm py-4 px-6 flex justify-center sticky top-0 z-20">
+          <nav className="flex gap-6 text-brown font-semibold text-base">
+            {[
+              { href: "/", label: "Accueil" },
+              { href: "/about", label: "À propos" },
+              { href: "/services", label: "Services" },
+              { href: "/realisations", label: "Réalisations" },
+              { href: "/testimonials", label: "Témoignages" },
+              { href: "/contact", label: "Contact" },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="relative transition-colors duration-200 hover:text-gold after:content-[''] after:block after:h-0.5 after:bg-gold after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-left after:mt-1"
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </header>
         {children}
+        <footer className="w-full bg-gold text-brown py-6 text-center font-medium mt-12 shadow-inner">
+          © {new Date().getFullYear()} Mabelle Consulting – Votre histoire, notre vision 360°
+        </footer>
       </body>
     </html>
   );
