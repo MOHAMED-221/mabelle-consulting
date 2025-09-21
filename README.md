@@ -78,27 +78,6 @@ SMTP_USER=your_email
 SMTP_PASS=your_password
 ```
 
-##  Structure du Projet
-src/
-├── app/ # Pages Next.js (App Router)
-│ ├── about/ # Page À propos
-│ ├── admin/ # Interface d'administration
-│ ├── api/ # API Routes
-│ ├── contact/ # Page Contact
-│ ├── realisations/ # Page Réalisations
-│ ├── services/ # Pages Services
-│ └── testimonials/ # Page Témoignages
-├── components/ # Composants réutilisables
-│ ├── AdminGuard.tsx # Protection admin
-│ └── SafeImage.tsx # Composant image sécurisé
-├── data/ # Données statiques
-│ ├── about-content.json
-│ └── projects.json
-├── lib/ # Utilitaires
-│ ├── projects.ts # Gestion des projets
-│ └── simpleStore.ts # Store simple pour Vercel Blob
-└── hooks/ # Hooks personnalisés
-
 ##  Design et UX
 
 - **Palette de couleurs** : Or (#CEA472) et Marron (#754831)
