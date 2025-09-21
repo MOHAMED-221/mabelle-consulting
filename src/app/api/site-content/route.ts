@@ -44,16 +44,16 @@ const defaultContent: SiteContent = {
 };
 
 export async function GET() {
-  const data = readJson<SiteContent>('site-content.json', defaultContent);
+  const data = await readJson<SiteContent>('site-content.json', defaultContent);
   return NextResponse.json(data);
 }
 
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-    const current = readJson<SiteContent>('site-content.json', defaultContent);
+    const current = await readJson<SiteContent>('site-content.json', defaultContent);
     const next = { ...current, ...body } as SiteContent;
-    writeJson('site-content.json', next);
+    await writeJson('site-content.json', next);
     return NextResponse.json(next);
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || 'Erreur serveur' }, { status: 500 });

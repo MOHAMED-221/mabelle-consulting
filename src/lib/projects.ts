@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { readJson, writeJson } from './simpleStore';
 
 export type Project = {
   id: number;
@@ -21,20 +22,12 @@ export function ensureStorage() {
   if (!fs.existsSync(dataFile)) fs.writeFileSync(dataFile, '[]', 'utf-8');
 }
 
-export function readProjects(): Project[] {
-  ensureStorage();
-  try {
-    const raw = fs.readFileSync(dataFile, 'utf-8');
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+export async function readProjects(): Promise<Project[]> {
+  return await readJson<Project[]>('projects.json', []);
 }
 
-export function writeProjects(projects: Project[]) {
-  ensureStorage();
-  fs.writeFileSync(dataFile, JSON.stringify(projects, null, 2), 'utf-8');
+export async function writeProjects(projects: Project[]) {
+  await writeJson('projects.json', projects);
 }
 
 export function nextId(projects: Project[]): number {

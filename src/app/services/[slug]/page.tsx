@@ -66,7 +66,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         {/* Hero image */}
         <div className="relative w-full h-56 md:h-72">
           <SafeImage src={service.image} alt={service.title} className="w-full h-full" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
           <div className="absolute left-0 bottom-0 p-6 flex items-center gap-3">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-mabelle-gold text-white text-2xl shadow">
               <Icon className="w-7 h-7" />

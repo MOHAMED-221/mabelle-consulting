@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { readProjects, writeProjects, nextId, getUploadsDir, type Project } from '@/lib/projects';
+import { put } from '@vercel/blob';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET() {
-  const projects = readProjects();
+  const projects = await readProjects();
   return NextResponse.json(projects);
 }
 
@@ -28,25 +29,27 @@ export async function POST(req: Request) {
         if (typeof v === 'string') (payload as any)[f] = v;
       });
 
-      const uploadsDir = getUploadsDir();
-
       const logo = form.get('logo');
       if (logo && logo instanceof File && logo.size > 0) {
-        const bytes = Buffer.from(await logo.arrayBuffer());
-        const filename = `${Date.now()}-${logo.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-        const filePath = path.join(uploadsDir, filename);
-        fs.writeFileSync(filePath, bytes);
-        logoPath = `/uploads/projects/${filename}`;
+        const pathname = `uploads/projects/${Date.now()}-${logo.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+        const blob = await put(pathname, logo as any, {
+          access: 'public',
+          addRandomSuffix: false,
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        } as any);
+        logoPath = blob.url;
       }
 
       const images = form.getAll('images');
       for (const file of images) {
         if (file instanceof File && file.size > 0) {
-          const bytes = Buffer.from(await file.arrayBuffer());
-          const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-          const filePath = path.join(uploadsDir, filename);
-          fs.writeFileSync(filePath, bytes);
-          imagePaths.push(`/uploads/projects/${filename}`);
+          const pathname = `uploads/projects/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+          const blob = await put(pathname, file as any, {
+            access: 'public',
+            addRandomSuffix: false,
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+          } as any);
+          imagePaths.push(blob.url);
         }
       }
 
@@ -62,7 +65,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Champs requis: nom, desc' }, { status: 400 });
     }
 
-    const projects = readProjects();
+    const projects = await readProjects();
     const id = nextId(projects);
 
     const project: Project = {
@@ -76,7 +79,7 @@ export async function POST(req: Request) {
     };
 
     projects.push(project);
-    writeProjects(projects);
+    await writeProjects(projects);
 
     return NextResponse.json(project, { status: 201 });
   } catch (e: any) {

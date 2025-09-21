@@ -25,14 +25,22 @@ export default function Services() {
   const [services, setServices] = useState<Service[]>(fallback);
 
   useEffect(() => {
-    (async () => {
+    let cancelled = false;
+    const load = async () => {
       try {
         const res = await fetch('/api/services', { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
-        if (Array.isArray(data) && data.length) setServices(data);
+        if (!cancelled && Array.isArray(data)) setServices(data);
       } catch {}
-    })();
+    };
+    load();
+    const onFocus = () => load();
+    const onVisibility = () => { if (document.visibilityState === 'visible') load(); };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+    const itv = setInterval(load, 20000);
+    return () => { cancelled = true; window.removeEventListener('focus', onFocus); document.removeEventListener('visibilitychange', onVisibility); clearInterval(itv); };
   }, []);
 
   return (
@@ -40,13 +48,13 @@ export default function Services() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.7 }}
-      className="min-h-[70vh] bg-gradient-to-br from-gold-light/30 to-white flex flex-col items-center py-12 md:py-20 px-4"
+      className="min-h-[70vh] bg-gradient-to-b from-[#CEA472] to-white flex flex-col items-center py-12 md:py-20 px-4"
     >
       {/* Header */}
       <div className="w-full max-w-6xl flex flex-col items-center text-center mb-10 md:mb-14">
         <motion.span initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="px-3 py-1 rounded-full text-xs font-semibold bg-mabelle-gold text-white mb-3">Expertises</motion.span>
         <motion.h1 initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="text-3xl md:text-5xl font-extrabold text-brown-dark mb-3">Nos services</motion.h1>
-        <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="text-brown/80 max-w-3xl">Des solutions sur-mesure pour sublimer votre marque.</motion.p>
+        <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="text-brown-dark/90 max-w-3xl">Des solutions sur-mesure pour sublimer votre marque.</motion.p>
       </div>
 
       {/* Cards */}

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: linear-gradient(135deg, #E6CBA0 0%, #CEA472 60%, #754831 100%);
+  --background: linear-gradient(135deg, #E6CBA0 0%, #CEA472 60%, #CEA472 100%);
   --foreground: #171717;
 }
 
@@ -32,9 +32,15 @@ body {
   background-size: cover;
 }
 
+@keyframes progress {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(-10%); }
+  100% { transform: translateX(100%); }
+}
+
 /* Utilitaires premium */
 .bg-mabelle-overlay {
-  background: linear-gradient(120deg, #E6CBA0cc 0%, #CEA472cc 60%, #754831cc 100%);
+  background: linear-gradient(120deg, #E6CBA0cc 0%, #CEA472cc 60%, #CEA472cc 100%);
 }
 .text-mabelle-gold {
   color: #CEA472;

@@ -22,7 +22,9 @@ export default function Contact() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Échec de l\'envoi');
       setMsg('Votre message a été envoyé. Merci !');
-      e.currentTarget.reset();
+      if (e.currentTarget) {
+        e.currentTarget.reset();
+      }
       setFocus({ name: false, email: false, message: false });
     } catch (err: any) {
       setMsg(err?.message || 'Erreur lors de l\'envoi');

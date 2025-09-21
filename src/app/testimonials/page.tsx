@@ -41,6 +41,7 @@ export default function Testimonials() {
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const total = testimonials.length;
 
@@ -49,13 +50,21 @@ export default function Testimonials() {
 
   // Charger depuis localStorage au montage
   useEffect(() => {
-    (async () => {
+    let cancelled = false;
+    const load = async () => {
       try {
         const res = await fetch('/api/testimonials', { cache: 'no-store' });
         const serverItems: Testimonial[] = await res.json();
-        setTestimonials((prev) => [...serverItems, ...prev.filter(p => p.text && p.author)]);
+        if (!cancelled) setTestimonials((prev) => [...serverItems, ...prev.filter(p => p.text && p.author)]);
       } catch {}
-    })();
+    };
+    load();
+    const onFocus = () => load();
+    const onVisibility = () => { if (document.visibilityState === 'visible') load(); };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+    const itv = setInterval(load, 20000);
+    return () => { cancelled = true; window.removeEventListener('focus', onFocus); document.removeEventListener('visibilitychange', onVisibility); clearInterval(itv); };
   }, []);
 
   // Ouvrir via ancre #temoigner
@@ -84,41 +93,64 @@ export default function Testimonials() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [total]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setSubmitting(true);
 
     const trimmedAuthor = author.trim();
     const trimmedText = text.trim();
 
     if (trimmedAuthor.length < 2) {
       setError('Veuillez renseigner un nom valide (au moins 2 caractères).');
+      setSubmitting(false);
       return;
     }
     if (trimmedText.length < 10) {
       setError('Votre témoignage est trop court (au moins 10 caractères).');
+      setSubmitting(false);
       return;
     }
 
     const newItem: Testimonial = { author: trimmedAuthor, text: trimmedText };
 
-    // Sauvegarde locale
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      const saved: Testimonial[] = raw ? JSON.parse(raw) : [];
-      const nextSaved = [...saved, newItem];
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSaved));
-    } catch {}
+      // Envoyer à l'API (qui sauvegarde ET envoie l'email de notification)
+      const response = await fetch('/api/testimonials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newItem)
+      });
 
-    // Mise à jour de l'UI
-    const nextList = [...testimonials, newItem];
-    setTestimonials(nextList);
-    setAuthor('');
-    setText('');
-    setSuccess('Merci pour votre témoignage !');
-    // Aller à la dernière slide (le nouveau)
-    setCurrent(nextList.length - 1);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de l\'envoi');
+      }
+
+      // Sauvegarde locale (fallback)
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        const saved: Testimonial[] = raw ? JSON.parse(raw) : [];
+        const nextSaved = [...saved, newItem];
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSaved));
+      } catch {}
+
+      // Mise à jour de l'UI
+      const nextList = [...testimonials, newItem];
+      setTestimonials(nextList);
+      setAuthor('');
+      setText('');
+      setSuccess('Merci pour votre témoignage ! Il a été envoyé avec succès.');
+      // Aller à la dernière slide (le nouveau)
+      setCurrent(nextList.length - 1);
+
+    } catch (err: any) {
+      console.error('Erreur lors de l\'envoi du témoignage:', err);
+      setError(err?.message || 'Erreur lors de l\'envoi du témoignage');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const openForm = () => {
@@ -131,7 +163,7 @@ export default function Testimonials() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="min-h-[70vh] bg-gradient-to-br from-gold-light/30 to-white flex flex-col items-center py-12 md:py-20 px-4"
+      className="min-h-[70vh] bg-gradient-to-b from-[#CEA472] to-white flex flex-col items-center py-12 md:py-20 px-4"
     >
       {/* Header */}
       <div className="w-full max-w-5xl flex flex-col items-center text-center mb-8 md:mb-10">
@@ -155,7 +187,7 @@ export default function Testimonials() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-brown/80 max-w-2xl mb-5"
+          className="text-brown-dark/90 max-w-2xl mb-5"
         >
           Découvrez ce que nos clients pensent de notre accompagnement, de notre créativité et de notre professionnalisme.
         </motion.p>
@@ -283,9 +315,14 @@ export default function Testimonials() {
                 <div className="mt-5 flex items-center justify-center gap-3">
                   <button
                     type="submit"
-                    className="px-6 py-2 rounded-full bg-mabelle-gold text-white font-semibold shadow hover:bg-mabelle-brown transition-colors"
+                    disabled={submitting}
+                    className={`px-6 py-2 rounded-full font-semibold shadow transition-colors ${
+                      submitting 
+                        ? 'bg-gray-400 text-white cursor-not-allowed' 
+                        : 'bg-mabelle-gold text-white hover:bg-mabelle-brown'
+                    }`}
                   >
-                    Envoyer mon témoignage
+                    {submitting ? 'Envoi en cours...' : 'Envoyer mon témoignage'}
                   </button>
                   <button
                     type="button"

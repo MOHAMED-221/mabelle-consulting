@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 type TeamMember = { name: string; role: string; image: string };
 type ClientLogo = { image: string; alt: string };
@@ -44,8 +45,8 @@ export default function AdminAbout() {
     setLoading(true); setMsg(null);
     try {
       const res = await fetch('/api/about-content', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) });
-      if (!res.ok) throw new Error('Échec de la sauvegarde');
       const saved = await res.json();
+      if (!res.ok) throw new Error(saved?.error || 'Échec de la sauvegarde');
       setData(saved);
       setMsg('Modifications enregistrées');
     } catch (e: any) { setMsg(e?.message || 'Erreur'); } finally { setLoading(false); }
@@ -55,6 +56,21 @@ export default function AdminAbout() {
     if (!data) return;
     await saveData(data);
   };
+
+  const saveMember = async (idx: number) => {
+    if (!data) return;
+    await saveData(data);
+  };
+
+  const moveMember = (idx: number, dir: -1 | 1) => setData(prev => {
+    if (!prev) return prev;
+    const list = [...prev.team];
+    const to = idx + dir;
+    if (to < 0 || to >= list.length) return prev;
+    const [item] = list.splice(idx, 1);
+    list.splice(to, 0, item);
+    return { ...prev, team: list };
+  });
 
   const updateTeam = (idx: number, patch: Partial<TeamMember>) => setData(prev => prev ? { ...prev, team: prev.team.map((m, i) => i === idx ? { ...m, ...patch } : m) } : prev);
   const addMember = () => setData(prev => prev ? { ...prev, team: [...prev.team, { name: '', role: '', image: '' }] } : prev);
@@ -107,16 +123,48 @@ export default function AdminAbout() {
           </div>
 
           <div>
-            <div className="text-sm font-semibold mb-2">Équipe</div>
-            {data.team.map((m, idx) => (
-              <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-2 items-center">
-                <input value={m.name} onChange={(e) => updateTeam(idx, { name: e.target.value })} className="border rounded-lg px-3 py-2" placeholder="Nom" />
-                <input value={m.role} onChange={(e) => updateTeam(idx, { role: e.target.value })} className="border rounded-lg px-3 py-2" placeholder="Rôle" />
-                <input value={m.image} readOnly className="border rounded-lg px-3 py-2 bg-gray-50" placeholder="Image" />
-                <input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; const url = await uploadImage(f, 'about/team'); updateTeam(idx, { image: url }); }} />
-                <button onClick={() => removeMember(idx)} className="px-4 py-1.5 rounded-full text-sm border">Supprimer</button>
-              </div>
-            ))}
+              <div className="text-sm font-semibold mb-2">Équipe</div>
+              {data.team.map((m, idx) => (
+                <div key={idx} className="border rounded-xl p-3 mb-2">
+                  <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-center">
+                    {/* Thumb */}
+                    <div className="flex items-center gap-3 md:col-span-2">
+                      <div className="w-14 h-14 rounded-full overflow-hidden border bg-gold-light flex-shrink-0">
+                        {m.image ? (
+                          <Image src={m.image} alt={m.name || 'Membre'} width={56} height={56} className="object-cover w-14 h-14" />
+                        ) : (
+                          <div className="w-14 h-14 flex items-center justify-center text-xs text-brown/70">Sans photo</div>
+                        )}
+                      </div>
+                      <div className="hidden md:block text-xs text-brown/70 truncate">{m.image || '—'}</div>
+                    </div>
+
+                    {/* Inputs */}
+                    <input value={m.name} onChange={(e) => updateTeam(idx, { name: e.target.value })} className="border rounded-lg px-3 py-2 md:col-span-2" placeholder="Nom" />
+                    <input value={m.role} onChange={(e) => updateTeam(idx, { role: e.target.value })} className="border rounded-lg px-3 py-2 md:col-span-2" placeholder="Rôle" />
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 md:col-span-6">
+                      <input type="file" accept="image/*" onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f || !data) return;
+                        setLoading(true); setMsg(null);
+                        try {
+                          const url = await uploadImage(f, 'about/team');
+                          const next: AboutContent = { ...data, team: data.team.map((mm, i) => i === idx ? { ...mm, image: url } : mm) };
+                          await saveData(next);
+                        } finally { setLoading(false); }
+                      }} />
+                      <div className="ml-auto flex items-center gap-2">
+                        <button onClick={() => moveMember(idx, -1)} className="px-3 py-1.5 rounded-full text-sm border" title="Monter">↑</button>
+                        <button onClick={() => moveMember(idx, 1)} className="px-3 py-1.5 rounded-full text-sm border" title="Descendre">↓</button>
+                        <button onClick={() => saveMember(idx)} className="px-4 py-1.5 rounded-full text-sm bg-mabelle-gold text-white">Sauver</button>
+                        <button onClick={() => removeMember(idx)} className="px-4 py-1.5 rounded-full text-sm border">Supprimer</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             <div className="flex gap-2 flex-wrap items-center mt-2">
               <button onClick={addMember} className="px-4 py-1.5 rounded-full text-sm border">Ajouter un membre (puis uploader la photo)</button>
             </div>

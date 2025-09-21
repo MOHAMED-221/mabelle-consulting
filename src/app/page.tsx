@@ -126,8 +126,8 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-gold-light via-white to-gold/10 flex flex-col items-center justify-start font-sans">
       {/* Hero avec slider d'images */}
       <section className="w-full relative h-[380px] md:h-[460px] flex items-center justify-center overflow-hidden bg-gold shadow-lg">
-        <div className="absolute top-6 left-6 z-20">
-          <Image src="/images/LOGO Mabelle-01.png" alt="Logo Mabelle Consulting" width={84} height={84} className="rounded-full bg-white/80 p-2 shadow-lg" />
+        <div className="absolute top-3 left-3 md:top-6 md:left-6 z-20">
+          <Image src="/images/LOGO Mabelle-01.png" alt="Logo Mabelle Consulting" width={220} height={220} className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36 rounded-full bg-white/80 p-2 shadow-lg object-contain" />
         </div>
         <div className="relative w-full h-full">
           <AnimatePresence initial={false} custom={direction}>
@@ -162,7 +162,7 @@ export default function Home() {
                 />
               </div>
               {/* Overlay léger pour lisibilité du texte */}
-              <div className="absolute inset-0 bg-black/25" />
+              <div className="absolute inset-0 bg-black/10" />
             </motion.div>
           </AnimatePresence>
         </div>
@@ -198,14 +198,51 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Présentation rapide sous forme de texte typewriter */}
-      <section className="w-full max-w-3xl px-4 py-16 flex flex-col items-center justify-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-brown-dark">Notre mission</h2>
-        <div className="w-full flex items-center justify-center min-h-[80px]">
-          <p className="text-2xl md:text-3xl text-brown-dark font-semibold text-center max-w-2xl mx-auto" style={{letterSpacing: '0.01em'}}>
-            {useTypewriter(missionText, 32)}
-            <span className="animate-pulse text-gold-dark">|</span>
-          </p>
+      {/* Notre mission – bloc premium */}
+      <section className="w-full max-w-5xl px-4 py-16 md:py-20">
+        <div className="relative overflow-hidden rounded-3xl border border-[#CEA472] bg-white/85 shadow-2xl">
+          {/* décor */}
+          <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-mabelle-gold/20 blur-3xl animate-pulse" />
+          <div className="pointer-events-none absolute -bottom-28 -left-28 w-80 h-80 rounded-full bg-[#754831]/10 blur-3xl animate-pulse [animation-delay:200ms]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(206,164,114,0.15),transparent_50%)]" />
+
+          <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+            {/* Badge icône */}
+            <div className="flex-shrink-0 inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-mabelle-gold text-white shadow-lg">
+              <Lightbulb className="w-10 h-10 md:w-12 md:h-12" />
+            </div>
+
+            {/* Texte */}
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-brown-dark tracking-tight">
+                Notre mission
+              </h2>
+              <div className="mt-2 mb-6 mx-auto md:mx-0 h-1 w-28 rounded-full bg-gradient-to-r from-[#CEA472] to-[#754831]" />
+
+              <div className="relative">
+                {/* guillemets décoratifs */}
+                <span className="hidden md:block absolute -left-8 -top-2 text-5xl text-gold-dark/30 select-none">“</span>
+                <span className="hidden md:block absolute -right-6 -bottom-6 text-5xl text-gold-dark/30 select-none">”</span>
+                <p className="text-xl md:text-2xl text-brown-dark font-semibold leading-relaxed" style={{ letterSpacing: '0.01em' }}>
+                  {useTypewriter(missionText, 28)}
+                  <span className="animate-pulse text-gold-dark">|</span>
+                </p>
+              </div>
+
+              {/* barre de progression taping */}
+              <div className="mt-3 h-1 w-full md:w-1/2 bg-gold-light/40 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#CEA472] to-[#754831] animate-[progress_2.2s_ease_infinite]" />
+              </div>
+
+              {/* Chips valeurs rapides */}
+              <div className="mt-6 flex flex-wrap gap-2 justify-center md:justify-start">
+                <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-gold-light/60 text-brown-dark border border-[#CEA472] hover:shadow transition">Créativité</span>
+                <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-gold-light/60 text-brown-dark border border-[#CEA472] hover:shadow transition">Professionnalisme</span>
+                <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-gold-light/60 text-brown-dark border border-[#CEA472] hover:shadow transition">Accompagnement humain</span>
+                <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-gold-light/60 text-brown-dark border border-[#CEA472] hover:shadow transition">Innovation</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -291,7 +328,7 @@ export default function Home() {
             <Link key={item.title} href="/realisations" className="group">
               <div className="relative h-56 rounded-2xl overflow-hidden shadow-xl border-2 border-[#CEA472]">
                 <Image src={item.img} alt={item.title} fill className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/30" />
+                <div className="absolute inset-0 bg-black/15" />
                 <div className="absolute inset-x-0 bottom-0 p-4 flex items-center justify-between">
                   <span className="text-white font-semibold text-lg drop-shadow">{item.title}</span>
                   <span className="px-3 py-1 rounded-full bg-mabelle-gold text-white text-sm font-semibold shadow">Voir</span>
@@ -324,7 +361,7 @@ export default function Home() {
             transition={{ duration: 0.7, type: 'spring' }}
           >
             <Image src="/images/proffessionalisme.png" alt="Professionnalisme" fill className="object-cover w-full h-full" />
-            <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-6">
+            <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center p-6">
               <span className="font-bold text-white text-lg text-center mb-1">{useTypewriter('Professionnalisme', 24)}</span>
               <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="text-white/90 text-center text-sm">Rigueur stratégique et excellence</motion.span>
             </div>
@@ -337,7 +374,7 @@ export default function Home() {
             transition={{ duration: 0.7, type: 'spring', delay: 0.1 }}
           >
             <Image src="/images/créativitée.png" alt="Créativité" fill className="object-cover w-full h-full" />
-            <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-6">
+            <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center p-6">
               <span className="font-bold text-white text-lg text-center mb-1">{useTypewriter('Créativité', 24)}</span>
               <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="text-white/90 text-center text-sm">Idées originales et audace</motion.span>
             </div>
@@ -350,7 +387,7 @@ export default function Home() {
             transition={{ duration: 0.7, type: 'spring', delay: 0.2 }}
           >
             <Image src="/images/acomepagnement_humain.png" alt="Accompagnement humain" fill className="object-cover w-full h-full" />
-            <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-6">
+            <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center p-6">
               <span className="font-bold text-white text-lg text-center mb-1">{useTypewriter('Accompagnement humain', 24)}</span>
               <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="text-white/90 text-center text-sm">Proximité et sur-mesure</motion.span>
             </div>
@@ -363,7 +400,7 @@ export default function Home() {
             transition={{ duration: 0.7, type: 'spring', delay: 0.3 }}
           >
             <Image src="/images/inovation.png" alt="Innovation" fill className="object-cover w-full h-full" />
-            <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-6">
+            <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center p-6">
               <span className="font-bold text-white text-lg text-center mb-1">{useTypewriter('Innovation', 24)}</span>
               <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="text-white/90 text-center text-sm">Veille & solutions nouvelles</motion.span>
             </div>

@@ -31,11 +31,39 @@ export async function POST(req: Request) {
 
     const subject = `Nouveau message de contact – ${name}`;
     const html = `
-      <div style="font-family:Arial,sans-serif;line-height:1.6">
-        <h2>Nouveau message de contact</h2>
-        <p><strong>Nom:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Message:</strong><br/>${String(message).replace(/\n/g, '<br/>')}</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #F5F1EB;">
+        <div style="background: linear-gradient(135deg, #CEA472 0%, #E6CBA0 100%); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">Nouveau message de contact !</h1>
+        </div>
+        
+        <div style="background: white; padding: 25px; border-radius: 10px; border-left: 5px solid #CEA472; margin-bottom: 20px;">
+          <h2 style="color: #754831; margin-top: 0;">Nom</h2>
+          <p style="font-size: 16px; color: #333; font-weight: bold;">${name}</p>
+          
+          <h2 style="color: #754831;">Email</h2>
+          <p style="font-size: 16px; color: #333; font-weight: bold;">${email}</p>
+          
+          <h2 style="color: #754831;">Message</h2>
+          <blockquote style="background: #F5F1EB; padding: 15px; border-left: 3px solid #CEA472; margin: 0; font-style: italic; color: #555;">
+            "${String(message).replace(/\n/g, '<br/>')}"
+          </blockquote>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+          <p style="margin: 0; color: #666; font-size: 14px;">
+            Reçu le ${new Date().toLocaleDateString('fr-FR', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </p>
+          <p style="margin: 10px 0 0 0; color: #CEA472; font-weight: bold;">
+            Mabelle Consulting - Votre histoire, notre vision 360°
+          </p>
+        </div>
       </div>
     `;
 

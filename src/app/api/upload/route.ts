@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-
-function ensureDir(dir: string) {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-}
 
 export async function POST(req: Request) {
   try {
@@ -19,20 +14,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Aucun fichier' }, { status: 400 });
     }
 
-    const uploadsBase = path.join(process.cwd(), 'public', 'uploads');
-    const targetDir = path.join(uploadsBase, subdir);
-    ensureDir(targetDir);
+    const sanitizedName = (file.name || 'file').replace(/[^a-zA-Z0-9._-]/g, '_');
+    const pathname = `uploads/${subdir}/${Date.now()}-${sanitizedName}`;
 
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const filename = `${Date.now()}-${sanitizedName}`;
-    const filePath = path.join(targetDir, filename);
+    const blob = await put(pathname, file as any, {
+      access: 'public',
+      addRandomSuffix: false,
+      // Optional: cache for 30 days for images; adjust if needed
+      cacheControlMaxAge: 2592000,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    } as any);
 
-    const bytes = Buffer.from(await file.arrayBuffer());
-    fs.writeFileSync(filePath, bytes);
-
-    const publicUrl = `/uploads/${subdir}/${filename}`;
-
-    return NextResponse.json({ url: publicUrl });
+    return NextResponse.json({ url: blob.url });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || 'Erreur upload' }, { status: 500 });
   }

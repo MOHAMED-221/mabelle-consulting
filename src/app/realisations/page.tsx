@@ -56,7 +56,7 @@ export default function Realisations() {
   const [carouselIdx, setCarouselIdx] = useState(0);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Charger les projets depuis l'API
+  // Charger les projets depuis l'API + rafraîchissement auto
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
@@ -64,13 +64,28 @@ export default function Realisations() {
         const res = await fetch('/api/projects', { cache: 'no-store' });
         if (!res.ok) return;
         const data: Project[] = await res.json();
-        if (!cancelled && Array.isArray(data) && data.length > 0) setProjets(data);
+        if (!cancelled && Array.isArray(data)) setProjets(data);
       } catch {
         // silent fallback
       }
     };
     load();
-    return () => { cancelled = true; };
+
+    // Refetch quand l'onglet redevient actif
+    const onFocus = () => load();
+    const onVisibility = () => { if (document.visibilityState === 'visible') load(); };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    // Polling léger toutes les 20s
+    const interval = setInterval(load, 20000);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibility);
+      clearInterval(interval);
+    };
   }, []);
 
   // Fermer la modale avec la touche Echap
@@ -95,7 +110,7 @@ export default function Realisations() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.7 }}
-      className="min-h-[70vh] bg-gradient-to-br from-gold-light/30 to-white flex flex-col items-center py-0 px-4"
+      className="min-h-[70vh] bg-gradient-to-b from-[#CEA472] to-white flex flex-col items-center py-0 px-4"
     >
       {/* Header visuel */}
       <div className="w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 py-12 md:py-20">
@@ -125,7 +140,7 @@ export default function Realisations() {
       <section className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {projets.map((p, idx) => (
           <motion.div
-            key={`${p.nom}-${idx}`}
+            key={p.id ?? `${p.nom}-${idx}`}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
@@ -143,7 +158,7 @@ export default function Realisations() {
               ) : (
                 p.logo ? <SafeImage src={p.logo} alt={`Logo ${p.nom}`} className="w-full h-full" /> : <div className="w-full h-full bg-gold-light" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
             </div>
             {/* Contenu */}
             <div className="flex flex-col items-center justify-center p-5 w-full flex-1">

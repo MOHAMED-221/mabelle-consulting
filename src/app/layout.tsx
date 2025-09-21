@@ -27,7 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={geistSans.className}>
         <header className="w-full bg-white shadow-sm py-4 px-6 flex justify-center sticky top-0 z-20">
-          <nav className="flex gap-6 text-brown font-semibold text-base">
+          <nav className="flex gap-6 text-brown font-semibold text-base max-w-full overflow-x-auto whitespace-nowrap scrollbar-hide sm:overflow-visible sm:whitespace-normal">
             {[
               { href: "/", label: "Accueil" },
               { href: "/about", label: "À propos" },
@@ -39,7 +39,7 @@ export default function RootLayout({
               <Link
                 key={href}
                 href={href}
-                className="relative transition-colors duration-200 hover:text-gold after:content-[''] after:block after:h-0.5 after:bg-gold after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-left after:mt-1"
+                className="relative transition-colors duration-200 hover:text-gold after:content-[''] after:block after:h-0.5 after:bg-gold after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-200 after:origin-left after:mt-1 px-1 sm:px-0"
               >
                 {label}
               </Link>

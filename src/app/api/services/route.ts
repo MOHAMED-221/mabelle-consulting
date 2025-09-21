@@ -110,7 +110,7 @@ const defaultServices: Service[] = [
 ];
 
 export async function GET() {
-  const services = readJson<Service[]>('services.json', defaultServices).map(s => ({
+  const services = (await readJson<Service[]>('services.json', defaultServices)).map(s => ({
     gallery: [],
     ...s,
     gallery: Array.isArray(s.gallery) ? s.gallery : [],
@@ -122,7 +122,7 @@ export async function PUT(req: Request) {
   try {
     const body = (await req.json()) as Service[];
     if (!Array.isArray(body)) return NextResponse.json({ error: 'Format invalide' }, { status: 400 });
-    writeJson('services.json', body);
+    await writeJson('services.json', body);
     return NextResponse.json(body);
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || 'Erreur serveur' }, { status: 500 });
